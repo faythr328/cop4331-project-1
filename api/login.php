@@ -25,7 +25,7 @@ if ($result->num_rows === 1) {
     //verify password
     if ($Password === $row['Password']) {
         $_SESSION['ID'] = $row['ID'];
-        header("Location: home.html ");
+        header("Location: ../home.html ");
         exit();
     } else {
         $error = "Invalid Password";

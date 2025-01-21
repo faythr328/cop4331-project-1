@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     // Check if the insert was successful
-    if ($result->num_rows > 0) {
+    if ($conn->affected_rows > 0) {
         // Redirect to login page
         registerSuccess();
     } else {

@@ -13,31 +13,45 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Login = $_POST['Login'];
     $Password = $_POST['Password'];
-}
 
-// Prepare SQL statement 
-$stmt = $conn->prepare("SELECT ID, Password, FirstName, LastName
+    if (!preg_match('/\w+/', $Login)) {
+        loginError('Invalid login');
+        exit();
+    }
+    if ($Password === '') {
+        loginError('Password cannot be empty');
+        exit();
+    }
+
+    // Prepare SQL statement 
+    $stmt = $conn->prepare("SELECT ID, Password, FirstName, LastName
 	 		 FROM Users
  			 WHERE Login = ?");
-$stmt->bind_param("s", $Login);
-$stmt->execute();
-$result = $stmt->get_result();
+    $stmt->bind_param("s", $Login);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ($result->num_rows === 1) {
-    $row = $result->fetch_assoc();
+    if ($result->num_rows === 1) {
+        $row = $result->fetch_assoc();
 
-    // Verify password
-    if ($Password === $row['Password']) {
-        $_SESSION['ID'] = $row['ID'];
-        loginSuccess($_SESSION['ID'], $row['FirstName'], $row['LastName']);
+        // Verify password
+        if ($Password === $row['Password']) {
+            $_SESSION['ID'] = $row['ID'];
+            loginSuccess($_SESSION['ID'], $row['FirstName'], $row['LastName']);
+        } else {
+            loginError("Invalid password");
+        }
     } else {
-        loginError("Invalid password");
+        loginError("Invalid login");
     }
+
+    // Close prepared statement
+    $stmt->close();
 } else {
-    loginError("Invalid login");
+    loginError("Invalid request");
 }
 
-$stmt->close();
+// Close the SQL connection
 $conn->close();
 
 function loginSuccess($id, $firstName, $lastName)

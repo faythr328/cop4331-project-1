@@ -5,7 +5,8 @@ include 'db.php';
 
 // Connection error check
 if ($conn->connect_error) {
-    die("Connection failed" . $conn->connect_error);
+    loginError("Failed to connect to database");
+    exit();
 }
 
 // Check if form is sumbmitted 
@@ -29,8 +30,6 @@ if ($result->num_rows === 1) {
     if ($Password === $row['Password']) {
         $_SESSION['ID'] = $row['ID'];
         loginSuccess($_SESSION['ID'], $row['FirstName'], $row['LastName']);
-        // header("Location: ../home.html");
-        exit();
     } else {
         loginError("Invalid password");
     }

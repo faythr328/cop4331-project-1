@@ -5,7 +5,8 @@ include 'db.php';
 
 // Connection error check
 if ($conn->connect_error) {
-    die("Connection failed" . $conn->connect_error);
+    registerError("Failed to connect to database");
+    exit();
 }
 
 // Check if form is sumbmitted 
@@ -26,10 +27,22 @@ $result = $stmt->get_result();
 // Check if the insert was successful
 if ($result->num_rows > 0) {
     // Redirect to login page
-    header('Location: ../index.html');
+    registerSuccess();
 }
 
 $stmt->close();
 $conn->close();
+
+function registerSuccess()
+{
+    header('Content-type: application/json');
+    echo '{"status": true, "error": ""}';
+}
+
+function registerError($error)
+{
+    header('Content-type: application/json');
+    echo '{"status": false, "error": "' . $error . '"}';
+}
 
 ?>

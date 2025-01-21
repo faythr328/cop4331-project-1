@@ -19,8 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Prepare SQL statement to create new user
-$stmt = $conn->prepare('INSERT INTO Users (Login, Password, FirstName, LastName) VALUES (?, ?, ?, ?)');
-$stmt->bind_param('ssss', $Login, $Password, $FirstName, $LastName);
+$stmt = $conn->prepare('INSERT INTO Users (FirstName, LastName, Login, Password) VALUES (?, ?, ?, ?)');
+$stmt->bind_param('ssss', $FirstName, $LastName, $Login, $Password);
 $stmt->execute();
 $result = $stmt->get_result();
 

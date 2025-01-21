@@ -1,18 +1,20 @@
 <?php
-//start/resume session (access session data) 
+// Start/resume session (access session data) 
 session_start();
 include 'db.php';
-//connection error check
+
+// Connection error check
 if ($conn->connect_error) {
     die("Connection failed" . $conn->connect_error);
 }
-//check if form is sumbmitted 
+
+// Check if form is sumbmitted 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Login = $_POST['Login'];
     $Password = $_POST['Password'];
 }
 
-//prepare SQL statement 
+// Prepare SQL statement 
 $stmt = $conn->prepare("SELECT ID, Password 
 	 		 FROM Users
  			 WHERE Login = ?");
@@ -22,19 +24,33 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     $row = $result->fetch_assoc();
-    //verify password
+
+    // Verify password
     if ($Password === $row['Password']) {
         $_SESSION['ID'] = $row['ID'];
-        header("Location: ../home.html ");
+        loginSuccess($_SESSION['ID'], $row['FirstName'], $row['LastName']);
+        // header("Location: ../home.html");
         exit();
     } else {
-        $error = "Invalid Password";
+        loginError("Invalid password");
     }
 } else {
-    $error = "Invalid Login";
+    loginError("Invalid login");
 }
 
 $stmt->close();
 $conn->close();
+
+function loginSuccess($id, $firstName, $lastName)
+{
+    header('Content-type: application/json');
+    echo '{"id": ' . $id . ',"firstName": "' . $firstName . '", "lastName": "' . $lastName . '", "error": ""}';
+}
+
+function loginError($error)
+{
+    header('Content-type: application/json');
+    echo '{"id": 0, "firstName": "", "lastName": "", "error": "' . $error . '"}';
+}
 
 ?>

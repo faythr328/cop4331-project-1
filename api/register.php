@@ -18,6 +18,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $LastName = $_POST['LastName'];
 }
 
+// Check whether a user exists with this login
+$stmt_check = $conn->prepare("SELECT ID FROM Users WHERE Login = ?");
+$stmt_check->bind_param("s", $Login);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
+if ($result_check->num_rows > 0) {
+    registerError("Username is already taken");
+    exit();
+}
+
 // Prepare SQL statement to create new user
 $stmt = $conn->prepare('INSERT INTO Users (FirstName, LastName, Login, Password) VALUES (?, ?, ?, ?)');
 $stmt->bind_param('ssss', $FirstName, $LastName, $Login, $Password);
